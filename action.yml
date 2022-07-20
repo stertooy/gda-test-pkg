@@ -45,7 +45,7 @@ runs:
          
          # If turned on by setting the COVERAGE environment variable, we 
          # collect coverage data
-         if [ ${{ inputs.COVERAGE }} ] then
+         if [ ${{ inputs.COVERAGE }} ]; then
              mkdir -p ${COVDIR-coverage}
              GAP="$GAP --cover ${COVDIR-coverage}/$(mktemp XXXXXX).coverage"
          fi
