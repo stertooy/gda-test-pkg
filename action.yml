@@ -1,10 +1,10 @@
 name: 'Test package'
 description: 'Test package'
 inputs:
-  NO_COVERAGE:
+  COVERAGE:
     description: 'Set to false to gather coverage'
     required: false
-    default: true
+    default: false
   GAP_TESTFILE:
     description: 'Name of the GAP file to be read for executing the package tests (overrides TestFile in PackageInfo.g)'
     required: false
@@ -43,9 +43,9 @@ runs:
          # start GAP with custom GAP root, to ensure correct package version is loaded
          GAP="$GAPROOT/bin/gap.sh ${{ inputs.GAP_FLAGS }} -l /tmp/gaproot; --quitonbreak"
          
-         # Unless explicitly turned off by setting the NO_COVERAGE environment variable,
-         # we collect coverage data
-         if [[ -z "${{ inputs.NO_COVERAGE }}" ]]; then
+         # If turned on by setting the COVERAGE environment variable, we 
+         # collect coverage data
+         if [ ${{ inputs.COVERAGE }} ] then
              mkdir -p ${COVDIR-coverage}
              GAP="$GAP --cover ${COVDIR-coverage}/$(mktemp XXXXXX).coverage"
          fi
