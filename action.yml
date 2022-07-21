@@ -30,6 +30,7 @@ runs:
         run: |
          set -ex
          echo $TERM
+         export TERM
          GAPROOT=/opt/gap
          
          # Set up a custom GAP root containing only this package, so that
