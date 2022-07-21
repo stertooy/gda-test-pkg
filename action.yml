@@ -1,24 +1,24 @@
-name: 'Test package'
-description: 'Test package'
+name: "Test GAP package"
+description: "Runs the tests included in the GAP package"
 inputs:
   COVERAGE:
-    description: 'Set to false to gather coverage'
+    description: "Set to true to gather coverage"
     required: false
     default: false
   GAP_TESTFILE:
-    description: 'Name of the GAP file to be read for executing the package tests (overrides TestFile in PackageInfo.g)'
+    description: "Name of the GAP file to be read for executing the package tests (overrides TestFile in PackageInfo.g)"
     required: false
-    default: ''
+    default: ""
   GAP_FLAGS:
-    description: 'Flags to pass to gap'
+    description: "Additional flags to pass to the GAP executable"
     required: false
-    default: ''
+    default: ""
   ONLY_NEEDED:
-    description: 'Only load needed packages'
+    description: "Only load necessary packages, not suggested ones, prior to testing"
     required: false
     default: false
   ALL_PACKAGES:
-    description: 'Load all packages'
+    description: "Load all packages prior to testing"
     required: false
     default: false
 
@@ -26,25 +26,21 @@ runs:
   using: "composite"
   steps:
       - name: "Run tests"
+        shell: bash
         run: |
          set -ex
          
          GAPROOT=/opt/gap
          
-         # set up a custom GAP root containing only this package, so that
+         # Set up a custom GAP root containing only this package, so that
          # we can force GAP to load the correct version of this package
-         # (we already did that in build_pkg.sh, but we do it again here,
-         # to allow the occasional instance where a package wants to also
-         # run the tests of others packages, by invoking this script multiple
-         # times in different directories)
          mkdir -p /tmp/gaproot/pkg/
          ln -f -s $PWD /tmp/gaproot/pkg/
          
-         # start GAP with custom GAP root, to ensure correct package version is loaded
+         # Start GAP with custom GAP root, to ensure correct package version is loaded
          GAP="$GAPROOT/bin/gap.sh ${{ inputs.GAP_FLAGS }} -l /tmp/gaproot; --quitonbreak"
          
-         # If turned on by setting the COVERAGE environment variable, we 
-         # collect coverage data
+         # Gather coverage
          if [ "${{ inputs.COVERAGE }}" == "true" ]; then
              mkdir -p ${COVDIR-coverage}
              GAP="$GAP --cover ${COVDIR-coverage}/$(mktemp XXXXXX).coverage"
@@ -79,5 +75,3 @@ runs:
              Error( "Package TestFile did not exit gap" );
          fi;
          GAPInput
-         
-        shell: bash
