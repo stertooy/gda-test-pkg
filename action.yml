@@ -29,7 +29,7 @@ runs:
         shell: bash
         run: |
          set -ex
-         
+         echo $TERM
          GAPROOT=/opt/gap
          
          # Set up a custom GAP root containing only this package, so that
