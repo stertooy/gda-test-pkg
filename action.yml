@@ -47,7 +47,7 @@ runs:
          fi
          
          $GAP <<GAPInput
-         
+         Print(GAPInfo.SystemEnvironment.TERM);
          GAP_TESTFILE := "${{ inputs.GAP_TESTFILE }}";
          
          Read( "PackageInfo.g" );
