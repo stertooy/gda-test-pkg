@@ -29,9 +29,6 @@ runs:
         shell: bash
         run: |
          set -ex
-         echo $TERM
-         export TERM
-         GAPROOT=/opt/gap
          
          # Set up a custom GAP root containing only this package, so that
          # we can force GAP to load the correct version of this package
@@ -39,7 +36,7 @@ runs:
          ln -f -s $PWD /tmp/gaproot/pkg/
          
          # Start GAP with custom GAP root, to ensure correct package version is loaded
-         GAP="$GAPROOT/bin/gap.sh ${{ inputs.GAP_FLAGS }} -l /tmp/gaproot; --quitonbreak"
+         GAP="gap ${{ inputs.GAP_FLAGS }} -l /tmp/gaproot; --quitonbreak"
          
          # Gather coverage
          if [ "${{ inputs.COVERAGE }}" == "true" ]; then
@@ -48,7 +45,7 @@ runs:
          fi
          
          $GAP <<GAPInput
-         Print(GAPInfo.SystemEnvironment);
+         
          GAP_TESTFILE := "${{ inputs.GAP_TESTFILE }}";
          
          Read( "PackageInfo.g" );
