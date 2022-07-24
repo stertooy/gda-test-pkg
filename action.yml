@@ -30,18 +30,16 @@ runs:
         run: |
          set -ex
          
-         # Set up a custom GAP root containing only this package, so that
-         # we can force GAP to load the correct version of this package
-         mkdir -p /tmp/gaproot/pkg/
+         # Add package to the custom GAP root
          ln -f -s $PWD /tmp/gaproot/pkg/
          
-         # Start GAP with custom GAP root, to ensure correct package version is loaded
-         GAP="gap ${{ inputs.GAP_FLAGS }} -l /tmp/gaproot; --quitonbreak"
+         # Add extra flags
+         GAP="gap ${{ inputs.GAP_FLAGS }}"
          
          # Gather coverage
          if [ "${{ inputs.COVERAGE }}" == "true" ]; then
-             mkdir -p ${COVDIR-coverage}
-             GAP="$GAP --cover ${COVDIR-coverage}/$(mktemp XXXXXX).coverage"
+             mkdir -p coverage
+             GAP="$GAP --cover coverage/$(mktemp XXXXXX).coverage"
          fi
          
          $GAP <<GAPInput
