@@ -21,15 +21,13 @@ inputs:
     description: "Load all packages prior to testing"
     required: false
     default: false
-defaults:
-  run:
-    shell: bash
 
 runs:
   using: "composite"
   steps:
   
     - name: "Run tests"
+      shell: bash
       run: |
         set -ex
        
