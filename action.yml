@@ -21,53 +21,57 @@ inputs:
     description: "Load all packages prior to testing"
     required: false
     default: false
+defaults:
+  run:
+    shell: bash
 
 runs:
   using: "composite"
   steps:
-      - name: "Run tests"
-        shell: bash
-        run: |
-         set -ex
+  
+    - name: "Run tests"
+      shell: bash
+      run: |
+        set -ex
+       
+        # Add package to the custom GAP root
+        ln -f -s $PWD /tmp/gaproot/pkg/
          
-         # Add package to the custom GAP root
-         ln -f -s $PWD /tmp/gaproot/pkg/
-         
-         # Add extra flags
-         GAP="gap ${{ inputs.GAP_FLAGS }}"
-         
-         # Gather coverage
-         if [ "${{ inputs.COVERAGE }}" == "true" ]; then
-             mkdir -p coverage
-             GAP="$GAP --cover coverage/$(mktemp XXXXXX).coverage"
-         fi
-         
-         $GAP <<GAPInput
-         
-         GAP_TESTFILE := "${{ inputs.GAP_TESTFILE }}";
-         
-         Read( "PackageInfo.g" );
-         info := GAPInfo.PackageInfoCurrent;
-         if IsEmpty( GAP_TESTFILE ) or not IsExistingFile( GAP_TESTFILE ) then
-             GAP_TESTFILE := info.TestFile;
-         fi;
-         
-         # Load the package with debug info
-         SetInfoLevel( InfoPackageLoading, PACKAGE_DEBUG );
-         SetPackagePath( info.PackageName, "/tmp/gaproot/pkg/$(basename $PWD)" );
-         if ${{ inputs.ALL_PACKAGES }} then
-             LoadAllPackages();
-         elif ${{ inputs.ONLY_NEEDED }} then
-             LoadPackage( info.PackageName : OnlyNeeded );
-         else
-             LoadPackage( info.PackageName );
-         fi;
-         SetInfoLevel( InfoPackageLoading, PACKAGE_ERROR );
-         
-         if EndsWith( GAP_TESTFILE, ".tst" ) then
-             QUIT_GAP( Test( GAP_TESTFILE, rec( compareFunction := "uptowhitespace" ) ) );
-         else
-             Read( GAP_TESTFILE );
-             Error( "Package TestFile did not exit gap" );
-         fi;
-         GAPInput
+        # Add extra flags
+        GAP="gap ${{ inputs.GAP_FLAGS }}"
+        
+        # Gather coverage
+        if [ "${{ inputs.COVERAGE }}" == "true" ]; then
+            mkdir -p coverage
+            GAP="$GAP --cover coverage/$(mktemp XXXXXX).coverage"
+        fi
+        
+        $GAP <<GAPInput
+        
+        GAP_TESTFILE := "${{ inputs.GAP_TESTFILE }}";
+        
+        Read( "PackageInfo.g" );
+        info := GAPInfo.PackageInfoCurrent;
+        if IsEmpty( GAP_TESTFILE ) or not IsExistingFile( GAP_TESTFILE ) then
+            GAP_TESTFILE := info.TestFile;
+        fi;
+        
+        # Load the package with debug info
+        SetInfoLevel( InfoPackageLoading, PACKAGE_DEBUG );
+        SetPackagePath( info.PackageName, "/tmp/gaproot/pkg/$(basename $PWD)" );
+        if ${{ inputs.ALL_PACKAGES }} then
+            LoadAllPackages();
+        elif ${{ inputs.ONLY_NEEDED }} then
+            LoadPackage( info.PackageName : OnlyNeeded );
+        else
+            LoadPackage( info.PackageName );
+        fi;
+        SetInfoLevel( InfoPackageLoading, PACKAGE_ERROR );
+        
+        if EndsWith( GAP_TESTFILE, ".tst" ) then
+            QUIT_GAP( Test( GAP_TESTFILE, rec( compareFunction := "uptowhitespace" ) ) );
+        else
+            Read( GAP_TESTFILE );
+            Error( "Package TestFile did not exit gap" );
+        fi;
+        GAPInput
