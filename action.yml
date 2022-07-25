@@ -30,7 +30,6 @@ runs:
   steps:
   
     - name: "Run tests"
-      shell: bash
       run: |
         set -ex
        
