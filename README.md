@@ -1,6 +1,6 @@
 # gda-test-pkg
 
-This GitHub action builds the GAP package located in the current directory. Based on [gap-actions/run-pkg-tests](https://github.com/gap-actions/run-pkg-tests).
+This GitHub action tests the GAP package located in the current directory. Based on [gap-actions/run-pkg-tests](https://github.com/gap-actions/run-pkg-tests).
 
 
 ## Usage
