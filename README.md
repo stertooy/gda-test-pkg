@@ -49,7 +49,7 @@ jobs:
       image: ghcr.io/stertooy/gda-image:master-slim
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: stertooy/gda-build-pkg@v1
       - uses: stertooy/gda-test-pkg@v1
 ```
