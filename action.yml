@@ -4,22 +4,32 @@ inputs:
   COVERAGE:
     description: "Set to true to gather coverage"
     required: false
+    type: boolean
     default: false
   GAP_TESTFILE:
     description: "Name of the GAP file to be read for executing the package tests (overrides TestFile in PackageInfo.g)"
     required: false
+    type: string
     default: ""
   GAP_FLAGS:
     description: "Additional flags to pass to the GAP executable"
     required: false
+    type: string
     default: ""
   ONLY_NEEDED:
     description: "Only load necessary packages, not suggested ones, prior to testing"
     required: false
+    type: boolean
     default: false
   ALL_PACKAGES:
     description: "Load all packages prior to testing"
     required: false
+    type: boolean
+    default: false
+  ERROR_ON_WARNING:
+    description: 'Set to true to treat warnings as errors'
+    required: false
+    type: boolean
     default: false
 
 runs:
@@ -56,6 +66,13 @@ runs:
         # Load the package with debug info
         SetInfoLevel( InfoPackageLoading, PACKAGE_DEBUG );
         SetPackagePath( info.PackageName, "$GAP_ROOT/pkg/$(basename $PWD)" );
+
+        # Capture the output of loading
+        output := "";
+        output_stream := OutputTextString( output, true );
+        SetPrintFormattingStatus( output_stream, false );
+        OutputLogTo( output_stream );
+        
         if ${{ inputs.ALL_PACKAGES }} then
             LoadAllPackages();
         elif ${{ inputs.ONLY_NEEDED }} then
@@ -63,6 +80,17 @@ runs:
         else
             LoadPackage( info.PackageName );
         fi;
+
+        OutputLogTo();
+        CloseStream(output_stream);
+
+        # Treat warnings as errors if specified
+        if ${{ inputs.ERROR_ON_WARNING }} then
+            if PositionSublist( output, "warning" ) <> fail then
+                Error( "Warnings were found when loading the package" );
+            fi;
+        fi;
+        
         SetInfoLevel( InfoPackageLoading, PACKAGE_ERROR );
         
         if EndsWith( GAP_TESTFILE, ".tst" ) then
